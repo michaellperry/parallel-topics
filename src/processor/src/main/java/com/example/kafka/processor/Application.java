@@ -1,5 +1,6 @@
 package com.example.kafka.processor;
 
+import io.javalin.Javalin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,24 +18,47 @@ public class Application {
         String applicationId = getEnvOrDefault("APPLICATION_ID", "purchase-processor");
         String inputTopic = getEnvOrDefault("INPUT_TOPIC", "purchases");
         String outputTopic = getEnvOrDefault("OUTPUT_TOPIC", "sku-totals");
+        int httpPort = Integer.parseInt(getEnvOrDefault("HTTP_PORT", "7000"));
         
-        logger.info("Configuration: bootstrapServers={}, applicationId={}, inputTopic={}, outputTopic={}",
-                bootstrapServers, applicationId, inputTopic, outputTopic);
+        logger.info("Configuration: bootstrapServers={}, applicationId={}, inputTopic={}, outputTopic={}, httpPort={}",
+                bootstrapServers, applicationId, inputTopic, outputTopic, httpPort);
         
-        // Create and start the processor
+        // Create the processor
         PurchaseProcessor processor = new PurchaseProcessor(
                 bootstrapServers, applicationId, inputTopic, outputTopic);
         
-        // Add shutdown hook to gracefully stop the processor
+        // Create the KTableController
+        KTableController controller = new KTableController(
+                processor.getStreams(), "sku-totals-store");
+        
+        // Start Javalin HTTP server
+        Javalin app = Javalin.create(config -> {
+            config.plugins.enableCors(cors -> cors.add(it -> it.anyHost()));
+        }).start(httpPort);
+        
+        // Register endpoint
+        app.get("/sku-totals", ctx -> {
+            logger.info("Received request for /sku-totals");
+            ctx.json(controller.getSkuTotals());
+        });
+        
+        // Add health check endpoint
+        app.get("/health", ctx -> {
+            logger.info("Received health check request");
+            ctx.result("OK");
+        });
+        
+        // Add shutdown hook to gracefully stop the processor and HTTP server
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Shutting down processor");
+            logger.info("Shutting down processor and HTTP server");
+            app.stop();
             processor.stop();
         }));
         
         // Start the processor
         processor.start();
         
-        logger.info("Processor started and running...");
+        logger.info("Processor and HTTP server started and running on port {}...", httpPort);
     }
     
     /**

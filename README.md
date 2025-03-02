@@ -75,6 +75,42 @@ The processor implements the following Kafka Streams topology:
    docker-compose down
    ```
 
+## Inspecting the KTable and Topics
+
+### Using the REST Endpoint
+
+The processor exposes a REST endpoint to query the state of the KTable. You can access it at:
+
+```
+http://localhost:8080/sku-totals
+```
+
+This will return a JSON object with the aggregated quantities by SKU.
+
+### Using Kafka CLI
+
+1. Attach to the Kafka CLI container:
+   ```
+   docker exec -it kafka-cli /bin/bash
+   ```
+
+2. List all Kafka topics:
+   ```
+   kafka-topics --bootstrap-server kafka:9092 --list
+   ```
+
+3. Describe a specific topic:
+   ```
+   kafka-topics --bootstrap-server kafka:9092 --describe --topic <topic-name>
+   ```
+
+4. Consume messages from a topic:
+   ```
+   kafka-console-consumer --bootstrap-server kafka:9092 --topic <topic-name> --from-beginning
+   ```
+
+By following these steps, you can inspect the KTable and topics used in your Kafka Streams example.
+
 ## Environment Variables
 
 ### Producer

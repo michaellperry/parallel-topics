@@ -30,6 +30,15 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
+  kafka-cli:
+    image: confluentinc/cp-kafka
+    container_name: kafka-cli
+    depends_on:
+      - kafka
+    command: tail -f /dev/null
+    tty: true
+    stdin_open: true
+
   producer:
     build:
       context: ..

@@ -14,6 +14,8 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.common.utils.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +89,9 @@ public class PurchaseProcessor {
                 .aggregate(
                     () -> 0, // Initial value
                     (sku, purchase, totalQuantity) -> totalQuantity + purchase.getQuantity(),
-                    Materialized.with(Serdes.String(), Serdes.Integer())
+                    Materialized.<String, Integer, KeyValueStore<Bytes, byte[]>>as("sku-totals-store")
+                        .withKeySerde(Serdes.String())
+                        .withValueSerde(Serdes.Integer())
                 );
         
         // Output the aggregated results to a topic
@@ -121,5 +125,14 @@ public class PurchaseProcessor {
         logger.info("Stopping Streams");
         streams.close();
         latch.countDown();
+    }
+    
+    /**
+     * Gets the KafkaStreams instance.
+     * 
+     * @return The KafkaStreams instance
+     */
+    public KafkaStreams getStreams() {
+        return streams;
     }
 }
