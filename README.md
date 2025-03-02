@@ -56,8 +56,9 @@ The consumer implements the following Kafka Streams topology:
 
 1. Start the containers:
    ```
-   cd kafka-streams-example/mesh
-   docker-compose up -d
+   cd mesh
+   docker compose pull
+   docker compose up -d --build
    ```
 
 2. Check the logs to see the producer generating purchase data:
@@ -70,9 +71,9 @@ The consumer implements the following Kafka Streams topology:
    docker logs -f purchase-consumer
    ```
 
-4. To stop the example:
+4. To stop the example when you are finished:
    ```
-   docker-compose down
+   docker compose down -v
    ```
 
 ## Inspecting the KTable and Topics
