@@ -64,6 +64,8 @@ services:
     depends_on:
       - kafka
       - producer
+    ports:
+      - "8080:7000"
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       INPUT_TOPIC: purchases
