@@ -28,13 +28,13 @@ public class Application {
         PurchaseProcessor consumer = new PurchaseProcessor(
                 bootstrapServers, applicationId, inputTopic, outputTopic);
         
+        // Create the KTableController before starting the streams
+        KTableController controller = new KTableController(
+                consumer.getStreams(), "sku-totals-store");
+        
         // Start the consumer
         logger.info("Starting Kafka Streams application");
         consumer.start();
-        
-        // Create the KTableController
-        KTableController controller = new KTableController(
-                consumer.getStreams(), "sku-totals-store");
         
         // Wait for the Kafka Streams application to be in the RUNNING state (with a timeout)
         boolean streamsReady = consumer.waitForRunningState(30000); // 30 seconds timeout

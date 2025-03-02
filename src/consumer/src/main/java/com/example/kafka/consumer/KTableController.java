@@ -41,16 +41,26 @@ public class KTableController {
         this.streams = streams;
         this.stateStoreName = stateStoreName;
         
-        // Add state listener to track when the streams application is running
-        streams.setStateListener((newState, oldState) -> {
-            logger.info("Kafka Streams state transition from {} to {}", oldState, newState);
-            if (newState == State.RUNNING) {
+        try {
+            // Add state listener to track when the streams application is running
+            streams.setStateListener((newState, oldState) -> {
+                logger.info("Kafka Streams state transition from {} to {}", oldState, newState);
+                if (newState == State.RUNNING) {
+                    this.storeReady = true;
+                    logger.info("Kafka Streams is now RUNNING, state stores should be available");
+                } else {
+                    this.storeReady = false;
+                }
+            });
+        } catch (IllegalStateException e) {
+            // If the streams application is already started, we can't set a state listener
+            // In this case, we'll just check the state directly
+            logger.warn("Could not set state listener: {}. Will check state directly.", e.getMessage());
+            if (streams.state() == State.RUNNING) {
                 this.storeReady = true;
-                logger.info("Kafka Streams is now RUNNING, state stores should be available");
-            } else {
-                this.storeReady = false;
+                logger.info("Kafka Streams is already RUNNING, state stores should be available");
             }
-        });
+        }
     }
     
     /**
