@@ -49,6 +49,16 @@ public class PurchaseProcessor {
         // Use the Purchase serde as the default value serde
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, PurchaseSerde.class.getName());
         
+        // Configure internal topics with proper replication factor
+        props.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 1);
+        props.put(StreamsConfig.TOPOLOGY_OPTIMIZATION_CONFIG, StreamsConfig.OPTIMIZE);
+        
+        // Configure state store settings
+        props.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams/" + applicationId);
+        
+        // Configure processing guarantees
+        props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
+        
         // Build the Streams topology
         final Topology topology = buildTopology(inputTopic, outputTopic, purchaseSerde);
         logger.info("Topology: {}", topology.describe());
@@ -108,6 +118,22 @@ public class PurchaseProcessor {
      */
     public void start() {
         logger.info("Starting Streams");
+        
+        // Clean up local state before starting
+        streams.cleanUp();
+        
+        // Set the uncaught exception handler
+        streams.setUncaughtExceptionHandler((thread, throwable) -> {
+            logger.error("Uncaught exception in Kafka Streams: ", throwable);
+            // You might want to restart the streams or take other actions here
+        });
+        
+        // Set the state listener to monitor state transitions
+        streams.setStateListener((newState, oldState) -> {
+            logger.info("Kafka Streams state transition from {} to {}", oldState, newState);
+        });
+        
+        // Start the streams
         streams.start();
         
         try {
