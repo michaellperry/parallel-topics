@@ -1,15 +1,16 @@
 package com.example.kafka.common;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.serialization.Serializer;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
- * Serializes Integer values to JSON for Kafka.
+ * Serializes Integer values to plain string representation for Kafka.
+ * This serializer converts integers directly to their string representation
+ * without wrapping them in JSON objects.
  */
-public class JsonIntegerSerializer implements Serializer<Integer> {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+public class PlainIntegerSerializer implements Serializer<Integer> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
@@ -23,10 +24,10 @@ public class JsonIntegerSerializer implements Serializer<Integer> {
         }
         
         try {
-            // Create a JSON object with a "value" field
-            return objectMapper.writeValueAsBytes(Map.of("value", data));
+            // Convert the integer directly to its string representation
+            return data.toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Error serializing Integer to JSON", e);
+            throw new RuntimeException("Error serializing Integer to string", e);
         }
     }
 

@@ -7,12 +7,12 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 
 /**
- * Custom Serde implementation for Integer objects that serializes to JSON.
- * This class combines JsonIntegerSerializer and JsonIntegerDeserializer into a single Serde.
+ * Custom Serde implementation for Integer objects that serializes to plain string representation.
+ * This class combines PlainIntegerSerializer and PlainIntegerDeserializer into a single Serde.
  */
-public class JsonIntegerSerde implements Serde<Integer> {
-    private final JsonIntegerSerializer serializer = new JsonIntegerSerializer();
-    private final JsonIntegerDeserializer deserializer = new JsonIntegerDeserializer();
+public class PlainIntegerSerde implements Serde<Integer> {
+    private final PlainIntegerSerializer serializer = new PlainIntegerSerializer();
+    private final PlainIntegerDeserializer deserializer = new PlainIntegerDeserializer();
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {

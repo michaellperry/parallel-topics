@@ -1,6 +1,6 @@
 package com.example.kafka.consumer;
 
-import com.example.kafka.common.JsonIntegerSerde;
+import com.example.kafka.common.PlainIntegerSerde;
 import com.example.kafka.common.Purchase;
 import com.example.kafka.common.PurchaseSerde;
 import org.apache.kafka.common.serialization.Serde;
@@ -106,9 +106,9 @@ public class PurchaseProcessor {
                         .withValueSerde(Serdes.Integer())
                 );
         
-        // Output the aggregated results to a topic as JSON
+        // Output the aggregated results to a topic as plain integers
         skuQuantityTable.toStream()
-                .to(outputTopic, Produced.with(Serdes.String(), new JsonIntegerSerde()));
+                .to(outputTopic, Produced.with(Serdes.String(), new PlainIntegerSerde()));
         
         logger.info("Built topology: Input topic -> Remap key to SKU -> Aggregate by SKU -> Output topic");
         
