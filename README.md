@@ -87,6 +87,18 @@ http://localhost:8080/sku-totals
 
 This will return a JSON object with the aggregated quantities by SKU.
 
+To see the status of the application startup, you can check the status endpoint at:
+
+```
+http://localhost:8080/status
+```
+
+You can check the health of the application at:
+
+```
+http://localhost:8080/health
+```
+
 ### Using Kafka CLI
 
 1. Attach to the Kafka CLI container:
@@ -106,7 +118,7 @@ This will return a JSON object with the aggregated quantities by SKU.
 
 4. Consume messages from a topic:
    ```
-   kafka-console-consumer --bootstrap-server kafka:9092 --topic <topic-name> --from-beginning
+   kafka-console-consumer --bootstrap-server kafka:9092 --topic sku-totals --property print.key=true
    ```
 
 By following these steps, you can inspect the KTable and topics used in your Kafka Streams example.
