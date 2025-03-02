@@ -12,8 +12,8 @@ COPY src/common/src /app/src/common/src/
 COPY src/producer/pom.xml /app/src/producer/
 COPY src/producer/src /app/src/producer/src/
 
-COPY src/processor/pom.xml /app/src/processor/
-COPY src/processor/src /app/src/processor/src/
+COPY src/consumer/pom.xml /app/src/consumer/
+COPY src/consumer/src /app/src/consumer/src/
 
 # Build the project
 RUN mvn -f /app/pom.xml clean package
@@ -21,6 +21,6 @@ RUN mvn -f /app/pom.xml clean package
 FROM openjdk:11-jre-slim
 
 WORKDIR /app
-COPY --from=build /app/src/processor/target/processor-1.0-SNAPSHOT-jar-with-dependencies.jar ./processor.jar
+COPY --from=build /app/src/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar ./consumer.jar
 
-CMD ["java", "-jar", "processor.jar"]
+CMD ["java", "-jar", "consumer.jar"]

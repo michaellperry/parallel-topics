@@ -1,4 +1,4 @@
-package com.example.kafka.processor;
+package com.example.kafka.consumer;
 
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;

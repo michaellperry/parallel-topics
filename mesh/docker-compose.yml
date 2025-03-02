@@ -1,4 +1,4 @@
-version: '3'
+name: parallel-streams
 
 services:
   zookeeper:
@@ -51,11 +51,11 @@ services:
       TOPIC_NAME: purchases
       PUBLISH_INTERVAL_MS: 1000
 
-  processor:
+  consumer:
     build:
       context: ..
-      dockerfile: src/processor/Dockerfile
-    container_name: purchase-processor
+      dockerfile: src/consumer/Dockerfile
+    container_name: purchase-consumer
     depends_on:
       - kafka
       - producer
@@ -63,4 +63,4 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       INPUT_TOPIC: purchases
       OUTPUT_TOPIC: sku-totals
-      APPLICATION_ID: purchase-processor
+      APPLICATION_ID: purchase-consumer

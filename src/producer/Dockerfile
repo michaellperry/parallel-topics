@@ -12,8 +12,8 @@ COPY src/common/src /app/src/common/src/
 COPY src/producer/pom.xml /app/src/producer/
 COPY src/producer/src /app/src/producer/src/
 
-COPY src/processor/pom.xml /app/src/processor/
-COPY src/processor/src /app/src/processor/src/
+COPY src/consumer/pom.xml /app/src/consumer/
+COPY src/consumer/src /app/src/consumer/src/
 
 # Build the project
 RUN mvn -f /app/pom.xml clean package

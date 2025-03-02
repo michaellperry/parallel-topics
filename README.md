@@ -20,7 +20,7 @@ kafka-streams-example/
     │   ├── Dockerfile
     │   ├── pom.xml
     │   └── src/main/java/...    # Producer application code
-    └── processor/               # Kafka Streams application
+    └── consumer/               # Kafka Streams application
         ├── Dockerfile
         ├── pom.xml
         └── src/main/java/...    # Streams processing code
@@ -38,7 +38,7 @@ The `Purchase` class represents a product purchase with the following fields:
 
 ## Kafka Streams Topology
 
-The processor implements the following Kafka Streams topology:
+The consumer implements the following Kafka Streams topology:
 
 1. Consume purchase messages from the input topic (key = orderId)
 2. Remap the messages to use SKU as the key instead of orderId
@@ -65,9 +65,9 @@ The processor implements the following Kafka Streams topology:
    docker logs -f purchase-producer
    ```
 
-3. Check the logs to see the processor processing the data:
+3. Check the logs to see the consumer processing the data:
    ```
-   docker logs -f purchase-processor
+   docker logs -f purchase-consumer
    ```
 
 4. To stop the example:
@@ -79,7 +79,7 @@ The processor implements the following Kafka Streams topology:
 
 ### Using the REST Endpoint
 
-The processor exposes a REST endpoint to query the state of the KTable. You can access it at:
+The consumer exposes a REST endpoint to query the state of the KTable. You can access it at:
 
 ```
 http://localhost:8080/sku-totals
@@ -120,6 +120,6 @@ By following these steps, you can inspect the KTable and topics used in your Kaf
 
 ### Processor
 - `KAFKA_BOOTSTRAP_SERVERS`: Kafka bootstrap servers (default: "localhost:9092")
-- `APPLICATION_ID`: Kafka Streams application ID (default: "purchase-processor")
+- `APPLICATION_ID`: Kafka Streams application ID (default: "purchase-consumer")
 - `INPUT_TOPIC`: Topic to consume purchase messages from (default: "purchases")
 - `OUTPUT_TOPIC`: Topic to output aggregated results to (default: "sku-totals")

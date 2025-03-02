@@ -12,7 +12,7 @@
     <modules>
         <module>src/common</module>
         <module>src/producer</module>
-        <module>src/processor</module>
+        <module>src/consumer</module>
     </modules>
 
     <properties>

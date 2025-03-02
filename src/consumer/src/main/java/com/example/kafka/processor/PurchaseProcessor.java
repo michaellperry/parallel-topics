@@ -1,8 +1,7 @@
-package com.example.kafka.processor;
+package com.example.kafka.consumer;
 
 import com.example.kafka.common.Purchase;
-import com.example.kafka.common.PurchaseDeserializer;
-import com.example.kafka.common.PurchaseSerializer;
+import com.example.kafka.common.PurchaseSerde;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -25,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Processes purchase data using Kafka Streams.
  * 
- * This processor:
+ * This consumer:
  * 1. Consumes purchase messages from the input topic (key = orderId)
  * 2. Remaps the messages to use SKU as the key
  * 3. Aggregates the quantities by SKU
@@ -43,11 +42,12 @@ public class PurchaseProcessor {
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
-        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         
         // Create custom Serdes for Purchase objects
-        final Serde<Purchase> purchaseSerde = Serdes.serdeFrom(
-                new PurchaseSerializer(), new PurchaseDeserializer());
+        final Serde<Purchase> purchaseSerde = new PurchaseSerde();
+        
+        // Use the Purchase serde as the default value serde
+        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, PurchaseSerde.class.getName());
         
         // Build the Streams topology
         final Topology topology = buildTopology(inputTopic, outputTopic, purchaseSerde);
