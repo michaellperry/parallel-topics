@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Processes purchase data using Kafka Streams.
@@ -136,12 +137,53 @@ public class PurchaseProcessor {
         // Start the streams
         streams.start();
         
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            logger.error("Streams interrupted", e);
-            Thread.currentThread().interrupt();
+        // Start a background thread to wait for the latch
+        Thread streamWaitThread = new Thread(() -> {
+            try {
+                latch.await();
+                logger.info("Streams application has been shut down");
+            } catch (InterruptedException e) {
+                logger.error("Streams wait thread interrupted", e);
+                Thread.currentThread().interrupt();
+            }
+        });
+        streamWaitThread.setDaemon(true);
+        streamWaitThread.start();
+        
+        logger.info("Streams started in background");
+    }
+    
+    /**
+     * Waits for the Streams application to be in the RUNNING state.
+     * 
+     * @param timeoutMs The maximum time to wait in milliseconds
+     * @return true if the streams application is in the RUNNING state, false otherwise
+     */
+    public boolean waitForRunningState(long timeoutMs) {
+        logger.info("Waiting for Kafka Streams to be in RUNNING state (timeout: {} ms)", timeoutMs);
+        
+        final long startTime = System.currentTimeMillis();
+        final long endTime = startTime + timeoutMs;
+        
+        while (System.currentTimeMillis() < endTime) {
+            if (streams.state() == KafkaStreams.State.RUNNING) {
+                logger.info("Kafka Streams is now in RUNNING state");
+                return true;
+            }
+            
+            logger.info("Kafka Streams is in {} state, waiting...", streams.state());
+            
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("Interrupted while waiting for RUNNING state", e);
+                return false;
+            }
         }
+        
+        logger.warn("Timed out waiting for Kafka Streams to be in RUNNING state. Current state: {}", streams.state());
+        return false;
     }
     
     /**
