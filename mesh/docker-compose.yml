@@ -1,4 +1,4 @@
-name: parallel-streams
+name: parallel-topics
 
 services:
   zookeeper:

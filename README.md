@@ -3,7 +3,7 @@
 This project demonstrates how to use Kafka Streams to process product purchase data. It consists of two main components:
 
 1. **Producer**: Generates a new purchase message every second and publishes it to a Kafka topic.
-2. **Processor**: Uses Kafka Streams to process the purchase data, remap the key from order ID to SKU, and aggregate quantities by SKU.
+2. **Consumer**: Uses Kafka Streams to process the purchase data, remap the key from order ID to SKU, and aggregate quantities by SKU.
 
 ## Project Structure
 
@@ -20,7 +20,7 @@ kafka-streams-example/
     │   ├── Dockerfile
     │   ├── pom.xml
     │   └── src/main/java/...    # Producer application code
-    └── consumer/               # Kafka Streams application
+    └── consumer/                # Kafka Streams application
         ├── Dockerfile
         ├── pom.xml
         └── src/main/java/...    # Streams processing code
